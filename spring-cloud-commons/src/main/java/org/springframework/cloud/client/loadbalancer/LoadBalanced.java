@@ -27,6 +27,11 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation to mark a RestTemplate bean to be configured to use a LoadBalancerClient
+ *
+ * 将一个RestTemplate标志位底层采用loadBalancerClient来执行实际的HTTP请求，以支持负载均衡。
+ * LoadBalanced在org.springframework.cloud.client.loadbalancer包下，我们就去看看这个包下有啥东西。
+ * 一般来说springCloud或者springboot相关的项目，一定会有一个xxAutoConfiguration类
+ * --2020.08.14
  * @author Spencer Gibb
  */
 @Target({ ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD })

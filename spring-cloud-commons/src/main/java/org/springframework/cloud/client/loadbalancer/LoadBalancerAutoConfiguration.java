@@ -37,6 +37,7 @@ import java.util.List;
 
 /**
  * Auto configuration for Ribbon (client side load balancing).
+ *专门为Ribbon自动化配置  --2020.8.14
  *
  * @author Spencer Gibb
  * @author Dave Syer
@@ -53,10 +54,22 @@ public class LoadBalancerAutoConfiguration {
 	@Autowired(required = false)
 	private List<RestTemplate> restTemplates = Collections.emptyList();
 
+	/**
+	 * @Author sunqixin
+	 * @Description //TODO
+	 * @Date 21:55 2020/8/14
+	 * @param restTemplateCustomizers:
+	 * @return SmartInitializingSingleton里面有个afterSingletonsInstantiated方法，return new一个，内部匿名类。
+	 **/
 	@Bean
 	public SmartInitializingSingleton loadBalancedRestTemplateInitializerDeprecated(
 			final ObjectProvider<List<RestTemplateCustomizer>> restTemplateCustomizers) {
+		//这里return的是SmartInitializingSingleton接口得实现，里面方法是afterSingletonsInstantiated().
+		//SmartInitializingSingleton看名字就是初始化一些东西，就是系统在启动的时候，一定会在某个时机来执行初始化动作。
+		//afterSingletonsInstantiated方法是在初始化后执行。
 		return () -> restTemplateCustomizers.ifAvailable(customizers -> {
+			//拿到当前restTemplates遍历，然后，对每个restTemplate遍历customizer。
+			//customizer看意思就是专门用来定制化RestTemplate的组件
             for (RestTemplate restTemplate : LoadBalancerAutoConfiguration.this.restTemplates) {
                 for (RestTemplateCustomizer customizer : customizers) {
                     customizer.customize(restTemplate);
