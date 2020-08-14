@@ -50,6 +50,12 @@ import java.util.List;
 @EnableConfigurationProperties(LoadBalancerRetryProperties.class)
 public class LoadBalancerAutoConfiguration {
 
+	//restTemplates从哪里来的呢？  其实是在定义configuration的时候，自己new的。list中的最终被customizer定制化
+	// @Bean
+	// @LoadBalanced
+	// RestTemplate restTemplate(){
+	//     return  new RestTemplate();
+	// }
 	@LoadBalanced
 	@Autowired(required = false)
 	private List<RestTemplate> restTemplates = Collections.emptyList();
@@ -98,10 +104,14 @@ public class LoadBalancerAutoConfiguration {
 			return new LoadBalancerInterceptor(loadBalancerClient, requestFactory);
 		}
 
+		//终于找到了loadBalancedRestTemplateInitializerDeprecated里的RestTemplateCustomizer。
 		@Bean
 		@ConditionalOnMissingBean
 		public RestTemplateCustomizer restTemplateCustomizer(
 				final LoadBalancerInterceptor loadBalancerInterceptor) {
+			//RestTemplateCustomizer里的customize()实现：定制化逻辑
+			//逻辑是：为restTemplate设置拦截器loadBalancerInterceptor。
+			//那这个loadBalancerInterceptor是谁呢，就是上面ribbonInterceptor返回的bean
 			return restTemplate -> {
                 List<ClientHttpRequestInterceptor> list = new ArrayList<>(
                         restTemplate.getInterceptors());
